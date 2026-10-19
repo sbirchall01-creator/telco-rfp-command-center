@@ -1,6 +1,6 @@
 import { createFileRoute, notFound, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { AlertTriangle, Download, RefreshCw, Upload, FileText, ChevronLeft, Plus, Minus, PenLine } from "lucide-react";
+import { AlertTriangle, Download, RefreshCw, Upload, FileText, ChevronLeft, CheckCircle2, Plus, Minus, PenLine } from "lucide-react";
 import { toast } from "sonner";
 import { AppShell, StatusPill, Countdown } from "@/components/AppShell";
 import { WbsBoard } from "@/components/WbsBoard";
@@ -205,7 +205,7 @@ function Workspace() {
                     <p className="truncate text-xs text-muted-foreground">{o.file} · {o.template}</p>
                     <div className="mt-1"><StatusPill tone={o.status === "Approved" ? "ok" : o.status === "Needs regeneration" ? "bad" : o.status === "Draft" ? "warn" : "info"}>{o.status}</StatusPill></div>
                   </div>
-                  <button aria-label={`Download ${o.name}`} onClick={() => toast(`Preparing ${o.file}`)} className="grid h-9 w-9 place-items-center rounded-lg border hover:bg-muted"><Download className="h-4 w-4" /></button>
+                  {o.url ? <a aria-label={`Download ${o.name}`} href={o.url} download={o.file} className="grid h-9 w-9 place-items-center rounded-lg bg-ink text-ink-foreground hover:opacity-90"><Download className="h-4 w-4" /></a> : <button aria-label={`Download ${o.name}`} onClick={() => toast(`${o.file} will be available once generated`)} className="grid h-9 w-9 place-items-center rounded-lg border text-muted-foreground hover:bg-muted"><Download className="h-4 w-4" /></button>}
                 </div>
               ))}
             </div>

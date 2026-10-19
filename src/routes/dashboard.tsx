@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowUpRight } from "lucide-react";
 import { AppShell, StatusPill } from "@/components/AppShell";
 import { opportunities, daysUntil } from "@/lib/mock-data";
+import { useAllProgress } from "@/lib/wbs-store";
 
 export const Route = createFileRoute("/dashboard")({
   head: () => ({
@@ -10,12 +11,15 @@ export const Route = createFileRoute("/dashboard")({
       { name: "description", content: "All live RFx responses with deadlines, progress, quality and compliance." },
       { property: "og:title", content: "Bid pipeline — BidDeck" },
       { property: "og:description", content: "All live RFx responses with deadlines, progress, quality and compliance." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: Dashboard,
 });
 
 function Dashboard() {
+  const progress = useAllProgress();
   const totalReqs = opportunities.reduce((s, o) => s + Object.values(o.compliance).reduce((a, b) => a + b, 0), 0);
   const next = Math.min(...opportunities.map((o) => daysUntil(o.submissionDeadline) ?? 999));
   return (
@@ -64,8 +68,8 @@ function Dashboard() {
               </div>
               <div className="mt-4 space-y-3 text-sm">
                 <div>
-                  <div className="flex justify-between"><span className="text-muted-foreground">Tasks complete</span><span className="font-mono">{o.progress}%</span></div>
-                  <div className="mt-1 h-1.5 rounded-full bg-muted"><div className="h-full rounded-full bg-signal" style={{ width: `${o.progress}%` }} /></div>
+                  <div className="flex justify-between"><span className="text-muted-foreground">Tasks complete</span><span className="font-mono">{progress[o.id]}%</span></div>
+                  <div className="mt-1 h-1.5 rounded-full bg-muted"><div className="h-full rounded-full bg-signal" style={{ width: `${progress[o.id]}%` }} /></div>
                 </div>
                 <div>
                   <div className="flex justify-between"><span className="text-muted-foreground">Compliance</span><span className="font-mono">{tot > 1 ? `${Math.round((c.Full / tot) * 100)}% full` : "Not analysed"}</span></div>

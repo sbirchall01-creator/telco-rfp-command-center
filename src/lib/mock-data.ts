@@ -190,12 +190,12 @@ export const evaluation = [
   { criterion: "References & experience", weight: 10, score: 88, source: "Customer" },
 ];
 
-export const outputs = [
-  { name: "Kick-off pack", file: "Vodaria_Kickoff.pptx", template: "Hansen kick-off v4", status: "Approved" },
-  { name: "Work breakdown structure", file: "Vodaria_WBS.xlsx", template: "Hansen WBS + RFP process", status: "Live in workspace" },
+export const outputs: { name: string; file: string; template: string; status: string; url?: string }[] = [
+  { name: "Kick-off pack", file: "Vodaria_RFx_Kickoff_Pack.pptx", template: "Hansen RFx kick-off pack", status: "Approved", url: "/downloads/Vodaria_RFx_Kickoff_Pack.pptx" },
+  { name: "Work breakdown structure", file: "Vodaria_RFP_Response_WBS.xlsx", template: "Hansen RFP response WBS + timeline", status: "Live in workspace", url: "/downloads/Vodaria_RFP_Response_WBS.xlsx" },
+  { name: "Proposal response", file: "Vodaria_RFx_Response.docx", template: "Hansen RFx response master", status: "Draft", url: "/downloads/Vodaria_RFx_Response.docx" },
   { name: "High-level solution document", file: "Vodaria_HLSD.docx", template: "None", status: "Draft" },
   { name: "Capability requirements response", file: "Annex_B_Requirements_RESPONSE.xlsx", template: "Customer (preserved)", status: "Needs regeneration" },
-  { name: "Proposal response", file: "Annex_D_Response.docx", template: "Customer (preserved)", status: "Draft" },
   { name: "Clarification questions", file: "Vodaria_Clarifications.xlsx", template: "Hansen clarifications", status: "In review" },
   { name: "Evaluation matrix", file: "Vodaria_Evaluation.xlsx", template: "Customer criteria (Annex E)", status: "Draft" },
 ];

@@ -1,9 +1,13 @@
 import { createFileRoute, notFound, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { AlertTriangle, Download, RefreshCw, Upload, FileText, ChevronLeft, CheckCircle2, Plus, Minus, PenLine } from "lucide-react";
+import { AlertTriangle, Download, RefreshCw, Upload, FileText, ChevronLeft, Plus, Minus, PenLine } from "lucide-react";
 import { toast } from "sonner";
 import { AppShell, StatusPill, Countdown } from "@/components/AppShell";
-import { getOpp, daysUntil, inventory, issues, requirements, wbs as initialWbs, evaluation, outputs, changes, type Compliance } from "@/lib/mock-data";
+import { WbsBoard } from "@/components/WbsBoard";
+import { getOpp, daysUntil, inventory, issues, requirements, evaluation, outputs, changes, type Compliance } from "@/lib/mock-data";
+import { useTasks, progressOf, type Task } from "@/lib/wbs-store";
+
+const phaseOf = (t: Task) => (t.type === "Process Activity" ? t.area.replace(/^\d+\.\d+\s*/, "") : "Proposal sections");
 
 export const Route = createFileRoute("/opportunities/$id")({
   loader: ({ params }) => {
@@ -13,7 +17,7 @@ export const Route = createFileRoute("/opportunities/$id")({
   },
   head: ({ loaderData }) => {
     const t = loaderData ? `${loaderData.opp.customer} · ${loaderData.opp.name} — BidDeck` : "Workspace — BidDeck";
-    return { meta: [{ title: t }, { name: "description", content: "RFx response workspace" }, { property: "og:title", content: t }, { property: "og:description", content: "RFx response workspace" }] };
+    return { meta: [{ title: t }, { name: "description", content: "RFx response workspace" }, { property: "og:title", content: t }, { property: "og:description", content: "RFx response workspace" }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] };
   },
   component: Workspace,
 });
@@ -26,8 +30,8 @@ const toneFor = (c: Compliance) => ({ Full: "ok", Partial: "warn", Non: "bad", C
 function Workspace() {
   const { opp } = Route.useLoaderData();
   const [tab, setTab] = useState<Tab>("Overview");
-  const [wbs, setWbs] = useState(initialWbs);
-  const pct = Math.round((wbs.filter((t) => t.done).length / wbs.length) * 100);
+  const tasks = useTasks(opp.id);
+  const pct = progressOf(tasks);
   const weighted = Math.round(evaluation.reduce((s, e) => s + (e.weight * e.score) / 100, 0));
 
   return (
@@ -68,9 +72,9 @@ function Workspace() {
             <div className="surface p-5">
               <h2 className="font-semibold">Task progress by phase</h2>
               <div className="mt-4 space-y-3">
-                {[...new Set(wbs.map((t) => t.phase))].map((p) => {
-                  const ts = wbs.filter((t) => t.phase === p); const d = ts.filter((t) => t.done).length;
-                  return <div key={p}><div className="flex justify-between text-sm"><span>{p}</span><span className="font-mono text-muted-foreground">{d}/{ts.length}</span></div><div className="mt-1 h-1.5 rounded-full bg-muted"><div className="h-full rounded-full bg-signal" style={{ width: `${(d / ts.length) * 100}%` }} /></div></div>;
+                {[...new Set(tasks.map(phaseOf))].map((p) => {
+                  const ts = tasks.filter((t) => phaseOf(t) === p && t.status !== "Not Applicable"); const d = ts.filter((t) => t.status === "Complete").length;
+                  return <div key={p}><div className="flex justify-between text-sm"><span>{p}</span><span className="font-mono text-muted-foreground">{d}/{ts.length}</span></div><div className="mt-1 h-1.5 rounded-full bg-muted"><div className="h-full rounded-full bg-signal" style={{ width: `${ts.length ? (d / ts.length) * 100 : 0}%` }} /></div></div>;
                 })}
               </div>
             </div>
@@ -140,24 +144,7 @@ function Workspace() {
           </div>
         )}
 
-        {tab === "WBS" && (
-          <div className="surface p-2 sm:p-4">
-            <div className="flex items-center justify-between px-3 py-2"><h2 className="font-semibold">Work breakdown</h2><span className="font-mono text-sm">{pct}% complete</span></div>
-            <ul className="divide-y">
-              {wbs.map((t) => (
-                <li key={t.id} className="flex items-center gap-3 px-3 py-3">
-                  <input type="checkbox" checked={t.done} onChange={() => setWbs((w) => w.map((x) => x.id === t.id ? { ...x, done: !x.done } : x))} className="h-4 w-4 accent-[var(--primary)]" />
-                  <span className="w-8 font-mono text-xs text-muted-foreground">{t.id}</span>
-                  <div className="min-w-0 flex-1">
-                    <p className={`text-sm font-medium ${t.done ? "text-muted-foreground line-through" : ""}`}>{t.task}</p>
-                    <p className="text-xs text-muted-foreground">{t.phase} · {t.owner} · due {t.due.slice(5)}</p>
-                  </div>
-                  {t.affected && !t.done && <StatusPill tone="warn">Affected by change</StatusPill>}
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
+        {tab === "WBS" && <WbsBoard opp={opp} tasks={tasks} />}
 
         {tab === "Evaluation" && (
           <div className="grid gap-4 lg:grid-cols-3">

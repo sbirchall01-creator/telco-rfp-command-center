@@ -128,7 +128,7 @@ export async function exportTasksToExcel(opp: { id: string; customer: string; na
   sum.addRow([]);
   sum.addRow(["Status", "Tasks"]).font = { bold: true };
   STATUSES.forEach((s) => sum.addRow([s, { formula: `COUNTIF(WBS!H:H,"${s}")` }]));
-  sum.addRow(["% complete", { formula: `B10/(SUM(B6:B10))` }]).getCell(2).numFmt = "0%";
+  sum.addRow(["% complete", { formula: `B9/SUM(B6:B9)` }]).getCell(2).numFmt = "0%";
   sum.getColumn(1).width = 18;
   sum.getColumn(2).width = 40;
   const buf = await wb.xlsx.writeBuffer();

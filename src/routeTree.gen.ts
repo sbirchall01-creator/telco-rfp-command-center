@@ -10,33 +10,68 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as OpportunitiesIdRouteImport } from './routes/opportunities.$id'
+import { Route as OpportunitiesNewRouteImport } from './routes/opportunities.new'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OpportunitiesIdRoute = OpportunitiesIdRouteImport.update({
+  id: '/opportunities/$id',
+  path: '/opportunities/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OpportunitiesNewRoute = OpportunitiesNewRouteImport.update({
+  id: '/opportunities/new',
+  path: '/opportunities/new',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/dashboard': typeof DashboardRoute
+  '/opportunities/$id': typeof OpportunitiesIdRoute
+  '/opportunities/new': typeof OpportunitiesNewRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/dashboard': typeof DashboardRoute
+  '/opportunities/$id': typeof OpportunitiesIdRoute
+  '/opportunities/new': typeof OpportunitiesNewRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/dashboard': typeof DashboardRoute
+  '/opportunities/$id': typeof OpportunitiesIdRoute
+  '/opportunities/new': typeof OpportunitiesNewRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/dashboard' | '/opportunities/$id' | '/opportunities/new'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/dashboard' | '/opportunities/$id' | '/opportunities/new'
+  id:
+    | '__root__'
+    | '/'
+    | '/dashboard'
+    | '/opportunities/$id'
+    | '/opportunities/new'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  DashboardRoute: typeof DashboardRoute
+  OpportunitiesIdRoute: typeof OpportunitiesIdRoute
+  OpportunitiesNewRoute: typeof OpportunitiesNewRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +83,35 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/opportunities/$id': {
+      id: '/opportunities/$id'
+      path: '/opportunities/$id'
+      fullPath: '/opportunities/$id'
+      preLoaderRoute: typeof OpportunitiesIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/opportunities/new': {
+      id: '/opportunities/new'
+      path: '/opportunities/new'
+      fullPath: '/opportunities/new'
+      preLoaderRoute: typeof OpportunitiesNewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  DashboardRoute: DashboardRoute,
+  OpportunitiesIdRoute: OpportunitiesIdRoute,
+  OpportunitiesNewRoute: OpportunitiesNewRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
